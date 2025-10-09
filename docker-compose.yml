@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:6-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+  php:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+      args:
+        - PUID=${PUID:-1000}
+        - PGID=${PGID:-1000}
+    restart: always
+    volumes:
+      - ../php:/var/www/html
+    networks:
+      - app-network
+    user: "${PUID:-1000}:${PGID:-1000}"
+
+  nginx:
+    image: nginx:1.21-alpine
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ../php:/var/www/html
+      - ${COMPOSE_PROJECT_PATH:-.}/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
