@@ -25,10 +25,21 @@ RUN docker-php-ext-install \
     pdo_pgsql \
     mbstring \
     xml \
-    bcmath
+    bcmath \
+    pcntl
+
+# Install redis
+RUN pecl install redis && docker-php-ext-enable redis
+
 
 # 4. Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install Laravel Installer globally
+USER dev
+RUN composer global require laravel/installer
+USER root
+
 
 # 5. Add custom aliases
 # Copy the alias file into the container, owned by the new user.
