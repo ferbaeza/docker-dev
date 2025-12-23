@@ -21,7 +21,7 @@ RUN groupadd -g ${PGID} dev && \
 
 # 3. Install nvm, Node.js, and Yarn
 ENV NVM_DIR /home/dev/.nvm
-ENV NODE_VERSION 20.11.1
+ENV NODE_VERSION 24.12.0
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 RUN mkdir -p $NVM_DIR && \
