@@ -1,0 +1,16 @@
+#!/bin/bash
+
+PROJECT_DIR="/Users/usuario/proyectos/docker"
+CONTAINER_NAME="opencode" # Ollama is now inside the opencode service
+
+cd "$PROJECT_DIR" || exit
+
+# Check if the opencode-client container is running
+if [ "$(docker ps -q -f name=opencode-client)" == "" ]; then
+    echo "📦 El servicio 'opencode' no está corriendo. Levantando el servicio..."
+    docker compose --profile app up -d
+    sleep 5 # Give some time for Ollama to start inside the container
+fi
+
+# Execute ollama command inside the opencode-client container
+docker compose -f "$PROJECT_DIR/docker-compose.yml" exec "$CONTAINER_NAME" ollama "$@"

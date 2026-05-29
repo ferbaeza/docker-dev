@@ -2,6 +2,7 @@ services:
   postgres:
     image: postgres:13-alpine
     restart: always
+    profiles: ["app"]
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -16,6 +17,7 @@ services:
   redis:
     image: redis:6-alpine
     restart: always
+    profiles: ["app"]
     ports:
       - "6379:6379"
     volumes:
@@ -31,6 +33,9 @@ services:
         - PUID=${PUID:-1000}
         - PGID=${PGID:-1000}
     restart: always
+    profiles: ["app"]
+    environment:
+      - OLLAMA_HOST=http://opencode:${OLLAMA_PORT:-11434}
     volumes:
       - ../php:/var/www/html
     networks:
@@ -40,6 +45,7 @@ services:
   nginx:
     image: nginx:1.21-alpine
     restart: always
+    profiles: ["app"]
     ports:
       - "80:80"
     volumes:
@@ -50,6 +56,28 @@ services:
     networks:
       - app-network
 
+  opencode:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - PUID=${PUID:-1000}
+        - PGID=${PGID:-1000}
+    container_name: opencode-client
+    profiles: ["app"]
+    user: "${PUID:-1000}:${PGID:-1000}"
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace
+      - ollama_data:/home/opencodeuser/.ollama
+      - opencode_config:/home/opencodeuser/.config/opencode
+    ports:
+      - "11434:11434"
+    networks:
+      - app-network
+    tty: true
+    stdin_open: true
+
 networks:
   app-network:
     driver: bridge
@@ -57,3 +85,5 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  ollama_data:
+  opencode_config:

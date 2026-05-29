@@ -4,20 +4,40 @@ FROM php:8.2-fpm
 ARG PUID=1000
 ARG PGID=1000
 
-# 1. Install system dependencies, including zsh
+# 1. Install system dependencies, including zsh and locales
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     unzip \
     zip \
     zsh \
+    locales \
     libpq-dev \
     libxml2-dev \
-    libonig-dev
+    libonig-dev \
+ && sed -i '/es_ES.UTF-8/s/^# //g' /etc/locale.gen \
+ && locale-gen
+
+# Set locale and terminal environment variables
+ENV LANG=es_ES.UTF-8 \
+    LC_ALL=es_ES.UTF-8 \
+    LC_CTYPE=es_ES.UTF-8 \
+    TERM=xterm-256color \
+    DEBIAN_FRONTEND=
 
 # 2. Create a non-root user with matching host UID/GID to avoid permission issues
-RUN groupadd -g ${PGID} dev && \
-    useradd -u ${PUID} -g dev -ms /bin/zsh dev
+RUN if getent group ${PGID}; then \
+        groupmod -n dev $(getent group ${PGID} | cut -d: -f1); \
+    else \
+        groupadd -g ${PGID} dev; \
+    fi && \
+    if getent passwd ${PUID}; then \
+        usermod -l dev -m -d /home/dev $(getent passwd ${PUID} | cut -d: -f1); \
+    else \
+        useradd -u ${PUID} -g ${PGID} -m -s /bin/zsh dev; \
+    fi && \
+    echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 3. Install nvm, Node.js, and Yarn
 ENV NVM_DIR /home/dev/.nvm
@@ -62,12 +82,17 @@ USER root
 COPY --chown=dev:dev php/aliases.zsh /home/dev/aliases.zsh
 
 # 8. Install Oh-My-Zsh and configure aliases
-# We switch to the user to run the installer, then add the command to source the aliases file to .zshrc
+# We switch to the user to run the installer, then add the command to source the aliases file to .zshrc and .bashrc
 USER dev
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
-    && echo "\nsource ~/aliases.zsh" >> ~/.zshrc
+    && echo "\nsource ~/aliases.zsh" >> ~/.zshrc \
+    && echo "\nsource ~/aliases.zsh" >> ~/.bashrc
 USER root
 
+# 9. Install OpenCode AI CLI and copy binary to /usr/local/bin (accessible to all users)
+RUN curl -fsSL https://opencode.ai/install | bash && \
+    cp /root/.opencode/bin/opencode /usr/local/bin/opencode && \
+    chmod 755 /usr/local/bin/opencode
 
 # Set the working directory
 WORKDIR /var/www/html

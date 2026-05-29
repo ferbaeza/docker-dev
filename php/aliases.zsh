@@ -17,7 +17,7 @@ alias credentials='git config credential.helper "cache --timeout=28800"'
 
 # Alias Fer
 ### GIT
-alias fer='git co   nfig user.name "Fernando Baeza" &&  git config user.email "fernando.baeza@zataca.com"'
+alias fer='git config user.name "Fernando Baeza" &&  git config user.email "[EMAIL_ADDRESS]"'
 alias pass='git config --global credential.helper store'
 ### ZSH
 alias e='exit'
