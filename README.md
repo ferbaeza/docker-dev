@@ -30,8 +30,8 @@ Ollama y OpenCode están combinados en un único servicio para simplificar la ge
 | `run` | `run` | Menú interactivo con opciones up (defecto) y build. |
 | `opencode/up` | `up` | Levanta los servicios (sin rebuild) y entra al contenedor PHP. |
 | `opencode/build` | `build` | Construye todos los contenedores desde cero, levanta los servicios y entra al contenedor PHP. |
-| `opencode/opencode` | `opencode` | Abre OpenCode dentro del contenedor. |
-| `opencode/ollama` | `ollama` | Ejecuta comandos de Ollama dentro del contenedor. |
+| `opencode-cli` | `opencode` | Abre OpenCode dentro del contenedor. |
+| `ollama` | `ollama` | Ejecuta comandos de Ollama dentro del contenedor. |
 
 ### opencode/build
 
@@ -53,23 +53,23 @@ Versión ligera: solo levanta servicios y entra a PHP (sin reconstruir):
 up
 ```
 
-### opencode/opencode
+### opencode-cli
 
 Abre OpenCode dentro del contenedor:
 
 ```bash
-./opencode/opencode
+./opencode-cli
 # o con alias
 opencode
 ```
 
-### opencode/ollama
+### ollama
 
 Gestiona Ollama dentro del contenedor:
 
 ```bash
-./opencode/ollama pull qwen2.5-coder:7b
-./opencode/ollama list
+./ollama pull qwen2.5-coder:7b
+./ollama list
 # o con alias
 ollama pull qwen2.5-coder:7b
 ollama list
@@ -82,8 +82,8 @@ Añade estas líneas a tu `~/.zshrc` o `~/.bashrc` para usar los scripts desde c
 ```bash
 alias build='/Users/usuario/proyectos/docker/opencode/build'
 alias up='/Users/usuario/proyectos/docker/opencode/up'
-alias ollama='/Users/usuario/proyectos/docker/opencode/ollama'
-alias opencode='/Users/usuario/proyectos/docker/opencode/opencode'
+alias ollama='/Users/usuario/proyectos/docker/ollama'
+alias opencode='/Users/usuario/proyectos/docker/opencode-cli'
 alias run='/Users/usuario/proyectos/docker/run'
 ```
 
@@ -97,14 +97,14 @@ source ~/.zshrc
 
 ```
 ├── run                   # Menú interactivo (up por defecto)
+├── opencode-cli           # Wrapper de OpenCode (CLI)
+├── ollama                 # Wrapper de Ollama
 ├── opencode/
 │   ├── Dockerfile        # Imagen de OpenCode + Ollama
 │   ├── entrypoint.sh     # Entrypoint del contenedor opencode
 │   ├── opencode.json     # Configuración de OpenCode
 │   ├── up                # up -d + exec php
-│   ├── build             # Build completo + exec php
-│   ├── ollama            # Wrapper de Ollama
-│   └── opencode          # Wrapper de OpenCode
+│   └── build             # Build completo + exec php
 ├── nginx/
 │   └── nginx.conf        # Configuración de Nginx
 ├── php/
@@ -141,8 +141,8 @@ docker compose --profile app up -d
 docker compose --profile app exec -it php zsh
 
 # Ejecutar Ollama
-docker compose --profile app exec opencode-client ollama <comando>
+docker compose --profile app exec opencode ollama <comando>
 
 # Ejecutar OpenCode
-docker compose --profile app exec opencode-client /home/opencodeuser/.opencode/bin/opencode
+docker compose --profile app exec opencode /home/opencodeuser/.opencode/bin/opencode
 ```
