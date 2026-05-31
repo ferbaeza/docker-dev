@@ -1,0 +1,23 @@
+#!/bin/bash
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+echo "Selecciona una opción:"
+echo "1) up   - Levantar servicios y entrar a PHP (por defecto)"
+echo "2) build - Construir, levantar y entrar a PHP"
+echo ""
+read -p "Opción [1]: " opt
+opt="${opt:-1}"
+
+case "$opt" in
+    1|"")
+        bash "$DIR/opencode/up"
+        ;;
+    2)
+        bash "$DIR/opencode/build"
+        ;;
+    *)
+        echo "Opción inválida: $opt"
+        exit 1
+        ;;
+esac

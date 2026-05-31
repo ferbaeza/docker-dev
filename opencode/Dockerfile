@@ -28,7 +28,7 @@ RUN if getent group ${PGID}; then \
     echo "opencodeuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Copy the custom entrypoint script
-COPY entrypoint.sh /usr/local/bin/custom_entrypoint.sh
+COPY opencode/entrypoint.sh /usr/local/bin/custom_entrypoint.sh
 RUN chmod +x /usr/local/bin/custom_entrypoint.sh
 
 # Set permissions for the Ollama data directory as root
@@ -47,7 +47,7 @@ RUN mkdir -p /home/opencodeuser/.local && \
     chmod -R 777 /home/opencodeuser/.local
 
 # Copy default OpenCode config with Ollama provider preconfigured
-COPY opencode.json /home/opencodeuser/.config/opencode/opencode.json
+COPY opencode/opencode.json /home/opencodeuser/.config/opencode/opencode.json
 RUN chown opencodeuser:opencodeuser /home/opencodeuser/.config/opencode/opencode.json
 
 # Pre-configure auth placeholder for Ollama (no real API key needed)

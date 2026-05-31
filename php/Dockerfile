@@ -89,11 +89,6 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     && echo "\nsource ~/aliases.zsh" >> ~/.bashrc
 USER root
 
-# 9. Install OpenCode AI CLI and copy binary to /usr/local/bin (accessible to all users)
-RUN curl -fsSL https://opencode.ai/install | bash && \
-    cp /root/.opencode/bin/opencode /usr/local/bin/opencode && \
-    chmod 755 /usr/local/bin/opencode
-
 # Set the working directory
 WORKDIR /var/www/html
 

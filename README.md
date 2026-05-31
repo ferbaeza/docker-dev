@@ -27,48 +27,49 @@ Ollama y OpenCode están combinados en un único servicio para simplificar la ge
 
 | Script | Alias | Descripción |
 |--------|-------|-------------|
-| `build.sh` | `build` | Construye todos los contenedores desde cero, levanta los servicios y entra al contenedor PHP. |
-| `up.sh` | `up` | Levanta los servicios (sin rebuild) y entra al contenedor PHP. |
-| `opencode.sh` | `opencode` | Abre OpenCode dentro del contenedor. |
-| `ollama.sh` | `ollama` | Ejecuta comandos de Ollama dentro del contenedor. |
+| `run` | `run` | Menú interactivo con opciones up (defecto) y build. |
+| `opencode/up` | `up` | Levanta los servicios (sin rebuild) y entra al contenedor PHP. |
+| `opencode/build` | `build` | Construye todos los contenedores desde cero, levanta los servicios y entra al contenedor PHP. |
+| `opencode/opencode` | `opencode` | Abre OpenCode dentro del contenedor. |
+| `opencode/ollama` | `ollama` | Ejecuta comandos de Ollama dentro del contenedor. |
 
-### build.sh
+### opencode/build
 
 Construcción completa y entrada a PHP:
 
 ```bash
-./build.sh
+./opencode/build
 # o con alias
 build
 ```
 
-### up.sh
+### opencode/up
 
 Versión ligera: solo levanta servicios y entra a PHP (sin reconstruir):
 
 ```bash
-./up.sh
+./opencode/up
 # o con alias
 up
 ```
 
-### opencode.sh
+### opencode/opencode
 
 Abre OpenCode dentro del contenedor:
 
 ```bash
-./opencode.sh
+./opencode/opencode
 # o con alias
 opencode
 ```
 
-### ollama.sh
+### opencode/ollama
 
 Gestiona Ollama dentro del contenedor:
 
 ```bash
-./ollama.sh pull qwen2.5-coder:7b
-./ollama.sh list
+./opencode/ollama pull qwen2.5-coder:7b
+./opencode/ollama list
 # o con alias
 ollama pull qwen2.5-coder:7b
 ollama list
@@ -79,10 +80,11 @@ ollama list
 Añade estas líneas a tu `~/.zshrc` o `~/.bashrc` para usar los scripts desde cualquier carpeta:
 
 ```bash
-alias build='/Users/usuario/proyectos/docker/build.sh'
-alias up='/Users/usuario/proyectos/docker/up.sh'
-alias ollama='/Users/usuario/proyectos/docker/ollama.sh'
-alias opencode='/Users/usuario/proyectos/docker/opencode.sh'
+alias build='/Users/usuario/proyectos/docker/opencode/build'
+alias up='/Users/usuario/proyectos/docker/opencode/up'
+alias ollama='/Users/usuario/proyectos/docker/opencode/ollama'
+alias opencode='/Users/usuario/proyectos/docker/opencode/opencode'
+alias run='/Users/usuario/proyectos/docker/run'
 ```
 
 Después de añadirlos, recarga la configuración:
@@ -94,16 +96,20 @@ source ~/.zshrc
 ## Estructura del Proyecto
 
 ```
-├── build.sh              # Build completo + exec php
-├── up.sh                 # up -d + exec php
-├── ollama.sh             # Wrapper de Ollama
-├── opencode.sh           # Wrapper de OpenCode
-├── docker-compose.yml    # Configuración de servicios
-├── Dockerfile            # Imagen de OpenCode + Ollama
+├── run                   # Menú interactivo (up por defecto)
+├── opencode/
+│   ├── Dockerfile        # Imagen de OpenCode + Ollama
+│   ├── entrypoint.sh     # Entrypoint del contenedor opencode
+│   ├── opencode.json     # Configuración de OpenCode
+│   ├── up                # up -d + exec php
+│   ├── build             # Build completo + exec php
+│   ├── ollama            # Wrapper de Ollama
+│   └── opencode          # Wrapper de OpenCode
+├── nginx/
+│   └── nginx.conf        # Configuración de Nginx
 ├── php/
 │   └── Dockerfile        # Imagen de PHP
-├── nginx.conf            # Configuración de Nginx
-├── entrypoint.sh         # Entrypoint del contenedor opencode
+├── docker-compose.yml    # Configuración de servicios
 ├── .env.example          # Variables de entorno de ejemplo
 └── README.md
 ```
@@ -135,8 +141,8 @@ docker compose --profile app up -d
 docker compose --profile app exec -it php zsh
 
 # Ejecutar Ollama
-docker compose --profile app exec opencode ollama <comando>
+docker compose --profile app exec opencode-client ollama <comando>
 
 # Ejecutar OpenCode
-docker compose --profile app exec opencode /home/opencodeuser/.opencode/bin/opencode
+docker compose --profile app exec opencode-client /home/opencodeuser/.opencode/bin/opencode
 ```
