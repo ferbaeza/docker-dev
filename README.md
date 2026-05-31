@@ -119,11 +119,12 @@ source ~/.zshrc
 - **Persistencia:** Los modelos descargados se guardan en el volumen `ollama_data` y las configuraciones de OpenCode en `opencode_config`.
 - **GPU:** Si tienes una tarjeta NVIDIA, recuerda descomentar la sección `deploy` en `docker-compose.yml` para un mejor rendimiento.
 - **Configuración de OpenCode:** La primera vez que ejecutes `opencode`, te preguntará qué modelo usar. Asegúrate de que apunte a `http://localhost:11434` (ya que Ollama corre en el mismo contenedor).
+- **Perfil `app`:** Todos los servicios usan `profiles: ["app"]`, por lo que cualquier comando `docker compose` debe incluir `--profile app`.
 
 ## Detener el entorno
 
 ```bash
-docker compose down -v --remove-orphans
+docker compose --profile app down -v --remove-orphans
 ```
 
 ## Comandos manuales (sin scripts)
